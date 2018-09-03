@@ -1,2 +1,0 @@
-# Dj
-Django Repository
