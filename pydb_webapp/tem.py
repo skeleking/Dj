@@ -26,6 +26,8 @@ def db_add_main():  #the main function to add data to db
             list_json[str_arch]=str_arch +'.json'
             with open(my_constants.IMG_PATH+ str_arch+ '\\'+ list_json[str_arch], 'r') as f_json_obj:
                 contents_of_json=json.load(f_json_obj)
+                print(my_constants.IMG_PATH+ str_arch+ '\\'+ list_json[str_arch] +'  opened! ')
+
         else:
             print("no "+ str_arch+'.json  file in '+ str_arch)
 
@@ -59,6 +61,7 @@ def db_add_main():  #the main function to add data to db
                                 #         "location": "屋顶",
                                 #         "content": "屋脊",
                                 #         "nmch_type": "灰塑",
+                                #         "p_or_d": "测绘图",
                                 #         "description": "广州市番禺区大学城崔氏宗祠的后座垂脊博古大样，由广州大学建筑与城市规划学院测绘于2018年。",
                                 #         "测绘图原稿图号": ""
                                 #       }
@@ -161,10 +164,10 @@ def create_directories(str_arch,list_walk_item): #list_walk_record['path',[subdi
     print("create_directories")
     str_path=str(list_walk_item[0])
     int_index=str_path.rfind('\\')
-    str_roo_dir=str_path[int_index +1:]
+    str_root_dir=str_path[int_index +1:]
     for str_dir in list_walk_item[1]:#此处如果有子目录重名，会引起无法入库。这里指的是在一个建筑中。str_arch范围内
         try:
-            if myModels.Directories.objects.get_or_create(dir_name= str_dir, arch= str_arch, root_dir=str_roo_dir)[1]:
+            if myModels.Directories.objects.get_or_create(dir_name= str_dir, arch= str_arch, root_dir=str_root_dir)[1]:
                 print(str_dir +"    created in table pydb_webapp_directories")
             else:
                 print(str_dir +"    exists in table pydb_webapp_directories")
@@ -178,7 +181,8 @@ def create_imgfiles(str_arch, filename, dic_of_jpg):
     try:
         if myModels.Imgfiles.objects.get_or_create(file_name= filename,arch= str_arch, defaults={'outer':dic_of_jpg['outer'],'site':dic_of_jpg['site'],
                                                                                           'location':dic_of_jpg['location'],'content':dic_of_jpg['content'],
-                                                                                          'nmch_type':dic_of_jpg['nmch_type'],'description':dic_of_jpg['description'],
+                                                                                          'nmch_type':dic_of_jpg['nmch_type'],'p_or_d':dic_of_jpg['p_or_d'],
+                                                                                         'description':dic_of_jpg['description'],
                                                                                           'drawing_num':dic_of_jpg['测绘图原稿图号']})[1]:
             print(filename + "      created in table pydb_webapp_imgfiles")
         else:

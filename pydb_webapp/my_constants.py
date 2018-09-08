@@ -13,7 +13,7 @@ IMG_PATH=u"d:\\myWork\\DataSource\\"
 class myClass():
     """Just a test class"""
     def __init__(self, name):
-        self.name = name;
+        self.name = name
         print("you have got it ,myClass")
 
     def func2(self):

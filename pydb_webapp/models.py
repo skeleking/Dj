@@ -20,7 +20,9 @@ class Archs(models.Model):
         return self.arch_name
 
 class Directories(models.Model):
-    dir_name = models.CharField(max_length= my_constants.MAX_NAME_LENGTH,primary_key=True, default='no_dir')
+    #dir_name = models.CharField(max_length= my_constants.MAX_NAME_LENGTH,primary_key=True, default='no_dir')#设为主键，但是不同的建筑群，可能有相同的结构名称，如“中厅”，引起UNIQE constraints 错误
+
+    dir_name = models.CharField(max_length=my_constants.MAX_NAME_LENGTH, default='none')
     arch =models.CharField(max_length= my_constants.MAX_NAME_LENGTH, default='none')
     root_dir = models.CharField(max_length= my_constants.MAX_NAME_LENGTH, default= 'none')
 
@@ -36,13 +38,14 @@ class Imgfiles(models.Model):
     location = models.CharField(max_length= my_constants.MAX_SIMPLE_LENGTH, default='none')
     content = models.CharField(max_length= my_constants.MAX_SIMPLE_LENGTH, default='none')
     nmch_type= models.CharField(max_length= my_constants.MAX_SIMPLE_LENGTH, default='none')
+    p_or_d = models.CharField(max_length= my_constants.MAX_SIMPLE_LENGTH, default='none')
     description = models.CharField(max_length=my_constants.MAX_DESCRIPTION_LENGTH, default='none')
     drawing_num = models.CharField(max_length=my_constants.MAX_SIMPLE_LENGTH, default='none')
 
     #def __init__(self):
      #   """初始化类"""
     def __str__(self):
-        return (self.file_name , self.arch, self.outer, self.site, self.location, self.content, self.rmch_type, self.description, '测绘原图编号'+ self.drawing_num)
+        return (self.file_name , self.arch, self.outer, self.site, self.location, self.content, self.nmch_type, self.p_or_d, self.description, '测绘原图编号'+ self.drawing_num)
 
 
 

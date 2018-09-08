@@ -1,11 +1,19 @@
 <!DOCTYPE html>
+{% load staticfiles %}
 <html lang="en">
+<meta name="viewport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0,
+                                     user-scalable=no">
 <head>
     <meta charset="UTF-8">
     <title>GzArch</title>
+    <script type="text/javascript" src="{% static 'jQuery-2.1.4/jquery.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7/css/bootstrap.min.css' %}">
+    <script type="text/javascript" src="{% static 'bootstrap-3.3.7/js/bootstrap.min.js' %}"></script>
 </head>
 <body>
-
+<!--原来的测试部分，包括从views.py传递过来的arch_list列表
 <a href="/db">add db</a>
 <br>
 <br>
@@ -13,5 +21,61 @@
 <br>
 <br>
 <a href="{% url 'add2' 7 8 %}">计算7+8</a>
+<ul>
+    {% for arch_name in arch_list %}
+    <li>
+        {{arch_name}}
+    </li>
+    {% endfor %}}
+</ul>  -->
+<!--用列表组实现的表格
+<ul class="list-group">
+	<li class="list-group-item">免费域名注册</li>
+	<li class="list-group-item">免费 Window 空间托管</li>
+	<li class="list-group-item">图像的数量</li>
+	<li class="list-group-item">24*7 支持</li>
+	<li class="list-group-item">每年更新成本</li>
+</ul>-->
+
+<a href="#" class="list-group-item active">免费域名注册</a>
+<a href="#" class="list-group-item">24*7 支持</a>
+<a href="#" class="list-group-item">免费 Window 空间托管</a>
+<a href="#" class="list-group-item">图像的数量</a>
+<a href="#" class="list-group-item">每年更新成本</a>
+
+<div class="well bs-sidebar" id="sidebar" style="background-color:#fff">
+    <ul class="nav nav-pills nav-stacked">
+        <li><a href='/'>Home</a></li>
+        <li><a href='/blog/'>Blog</a></li>
+        <li><a href='/contact/'>Contact</a></li>
+    </ul>
+</div>
+<table class="table table-hover">
+   <caption>悬停表格布局</caption>
+   <thead>
+      <tr>
+         <th>名称</th>
+         <th>城市</th>
+         <th>密码</th>
+      </tr>
+   </thead>
+   <tbody>
+      <tr>
+         <td>Tanmay</td>
+         <td>Bangalore</td>
+         <td>560001</td>
+      </tr>
+      <tr>
+         <td>Sachin</td>
+         <td>Mumbai</td>
+         <td>400003</td>
+      </tr>
+      <tr>
+         <td>Uma</td>
+         <td>Pune</td>
+         <td>411027</td>
+      </tr>
+   </tbody>
+</table>
 </body>
 </html>

@@ -12,6 +12,7 @@ class ArchsAdmin(admin.ModelAdmin):
 class DirectoriesAdmin(admin.ModelAdmin):
     list_display = ('dir_name','arch','root_dir')
 
+
 # class Imgfiles(models.Model):
 #     file_name = models.ImageField(upload_to='img', default= 'none.img')
 #     arch = models.CharField(max_length= my_constants.MAX_NAME_LENGTH, default='none')
