@@ -32,7 +32,7 @@ def index(request):
     #return render(request ,template_name='home.html',context={'建筑群':archs_datasets})
     #return HttpResponse(tem_to_str)
     archs=['万木草堂','崔氏宗祠','梁氏大宗祠']
-    return render(request, template_name='home.html', context={'arch_list': archs_datasets} )
+    return render(request, template_name='index.html', context={'arch_list': archs_datasets} )
 
 
 def add(request):

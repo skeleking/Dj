@@ -67,7 +67,7 @@ def db_add_main():  #the main function to add data to db
                                 #       }
                                 create_imgfiles(str_arch, str_filename, dic_of_jpg)
                             else:
-                                print("缺乏 "+ str_filename + " 的json文件")
+                                print("缺乏 "+ str_filename + " 的json文件定义")
                                 pass
                         else:
                             print(str_filename + "  不是jpg文件，忽略入库操作")
