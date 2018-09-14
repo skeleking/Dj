@@ -24,7 +24,7 @@ class DirectoriesAdmin(admin.ModelAdmin):
 #     description = models.CharField(max_length=my_constants.MAX_DESCRIPTION_LENGTH, default='none')
 #     drawing_num = models.CharField(max_length=my_constants.MAX_SIMPLE_LENGTH, default='none')
 class ImagefilesAdmin(admin.ModelAdmin):
-    list_display = ('file_name','arch','outer','site','location','content','nmch_type','p_or_d','description','drawing_num')
+    list_display = ('file_name','arch','outer','site','location','content','nmch_type','p_or_d','description','drawing_num','root_dir')
 
 #admin.AdminSite.register([models.Archs,models.Directories,models.Imgfiles]    )
 admin.AdminSite.register(admin.site , model_or_iterable=models.Archs,admin_class= ArchsAdmin)

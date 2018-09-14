@@ -23,6 +23,24 @@
                 x = document.getElementById("panel-423334")
                 x.innerHTML = "当前建筑群是: "+ str_arch ;
 
+                y = document.getElementById("column_image_show")
+                y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'img/头门1-4立面图.jpg' %}\" class=\"img-thumbnail\" />"
+
+
+                /*alert("gggghhhhjjjjj");
+                var post_data={"arch_name":str_arch}
+                $.ajax({
+                    <!--url: 'add/',-->
+                    type: "POST",
+                    data: post_data,
+                    dataType: 'json',
+                    success: function (data) {
+                        //data = JSON.parse(data);
+
+                            alert("dsadsadsada");
+                    }
+                });*/
+
             }
         </script>
         <div class="row clearfix">
@@ -404,12 +422,12 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 column">
+            <div class="col-md-6 column" id="column_image_show">
                 <img alt="正在加载数据库中图片......" src="{% static 'img/头门1-4立面图照片.jpg' %}" class="img-thumbnail" />
             </div>
         </div>
         <div class="row clearfix">
-            <div class="col-md-4 column">
+            <div class="col-md-4 column" >
                 <p>
                     <em>i.非遗建筑</em> 是一个非遗建筑保护展示网站，由 <strong>广州大学建筑与城市规划学院庞玥老师</strong> 主持，用来对非遗建筑的测绘和保护成果进行展示。 <small></small> 
                 </p>

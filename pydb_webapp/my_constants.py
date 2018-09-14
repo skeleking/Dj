@@ -6,7 +6,7 @@ MAX_NAME_LENGTH = 60
 MAX_SIMPLE_LENGTH = 10
 MAX_DESCRIPTION_LENGTH =255
 
-IMG_PATH=u"d:\\myWork\\DataSource\\"
+IMG_PATH=u"c:\\myWork\\DataSource\\"
 #DB_NAME = u'd:\\myWork\\PycharmProjects\\Dj1\\db.sqlite3'
 
 

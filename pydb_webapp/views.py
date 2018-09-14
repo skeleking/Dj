@@ -18,6 +18,7 @@ b_addtodb = True
 #===================================================================================
 #网页访问模块
 
+
 def index(request):
     #return HttpResponse(u"Welcome to py's WebSite!...6")
     #if(b_addtodb):
@@ -42,6 +43,7 @@ def add(request):
     # b = request.GET['b']
     c = int(a) + int(b)
     return HttpResponse(str(c))
+
 
 def add2(request,a,b):
     c = int(a)+int(b)
