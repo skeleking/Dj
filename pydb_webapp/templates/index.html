@@ -22,6 +22,9 @@
                 xmlhttp = new XMLHttpRequest();
                 x = document.getElementById("panel-423334")
                 x.innerHTML = "当前建筑群是: "+ str_arch ;
+                y= document.getElementById("column_image_display")
+
+                y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'img/头门1-4立面图.jpg' %}\" class=\"img-thumbnail\" />"
 
             }
         </script>
@@ -404,7 +407,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 column">
+            <div class="col-md-6 column" id="column_image_display">
                 <img alt="正在加载数据库中图片......" src="{% static 'img/头门1-4立面图照片.jpg' %}" class="img-thumbnail" />
             </div>
         </div>
