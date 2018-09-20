@@ -1,0 +1,655 @@
+﻿<!DOCTYPE html>
+{% load staticfiles %}
+<meta name="viewport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0,
+                                     user-scalable=no">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GzArch</title>
+    <script type="text/javascript" src="{% static 'jQuery-2.1.4/jquery.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7/css/bootstrap.min.css' %}">
+    <script type="text/javascript" src="{% static 'bootstrap-3.3.7/js/bootstrap.min.js' %}"></script>
+</head>
+<script>
+     var dic_stucture ={{ pydb_structure | safe }};
+     //var int_archs_num =0;
+     var list_archs = new Array();
+     for(let key1 in dic_stucture){
+        //int_archs_num ++;
+        list_archs.push(key1);
+     }
+     var str_active_arch = list_archs[0];
+     var str_active_dir = list_archs[0];
+     var array_list_dirs =new Array();
+     var str_active_img ="";
+
+
+     console.log(list_archs);
+
+</script>
+<body>
+    <div class="container">
+        <script>
+            //function load_
+            function load_dirs(  str_arch_clicked )
+            {
+                //xmlhttp = new XMLHttpRequest();
+                str_active_arch = str_arch_clicked ;
+                str_active_dir = str_arch_clicked ;
+                console.log(str_arch_clicked);
+                x = document.getElementById("panel-423334");
+                //x.innerHTML = "当前建筑群是: "+list_archs[i_arch] ;
+                x.innerHTML = "当前建筑群是: "+str_arch_clicked ;
+                y = document.getElementById("column_image_show");
+                y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'img/头门1-4立面图.jpg' %}\" class=\"img-thumbnail\" />" ;
+
+
+                element_table_tbody_1 = document.getElementById("id-table-tbody-1");
+                //===============遍历移除所有子元素，即所有目录和文件信息===============================
+                var array_child_nodes = element_table_tbody_1.childNodes;
+                if(array_child_nodes.length >0) {
+                    for (let i = array_child_nodes.length - 1; i >= 0; i--)
+                        element_table_tbody_1.removeChild(array_child_nodes[i]);//注意这里要倒序移除
+                }
+
+                //===========================================下面一段用于获取active建筑群的结构信息，存入数组array_list_dirs中============================
+                console.log(dic_stucture);
+                for (let key1 in dic_stucture){
+                    if (key1== str_arch_clicked){
+                        //console.log(dic_stucture[key1]);
+                        //array_list_dirs.length=0;   //当前结构信息的数组，清空数组//如果array_list_dirs是指向dic_stucture的存储区，类似指针，所以会导致原始dic_stucture被清空
+                        //array_list_dirs.push(dic_stucture[key1]);//重新给结构信息数组赋值，但是dic_structure[key1]只会成为数组的第一个元素。等于多了一维
+                        array_list_dirs = dic_stucture[key1];//所以这里用直接赋值比较好。应该是相当于指针赋值操作。
+                    }
+
+                }
+                console.log(array_list_dirs);
+                //===============================遍历当前建筑的结构信息，找到匹配的当前活动目录str_active_dir，并显示出其内容==========================
+                for (let i=0; i< array_list_dirs.length; i++)       //这里的数据结构，见“获取某建筑的目录结构信息.png”
+                {
+                    if(array_list_dirs[i][0] == str_active_dir){    //这里array_list_dirs是一个数组（子目录名或者文件名）的数组（目录名数组，含当前目录名，其下子目录数组，文件数组）的数组（含多个目录名数组）
+                        if(array_list_dirs[i][1].length == 0 && array_list_dirs[i][2].length >0 ){       //说明这里是一个包含图片文件名的数组。在点建筑群时，不可能出现
+                            for (let j = 0; j < array_list_dirs[i][2].length; j++)
+                            {
+
+                                var tr1 = document.createElement("tr");
+                                tr1.ondblclick = load_img;
+                                tr1.innerHTML = array_list_dirs[i][2][j];
+                                element_table_tbody_1.appendChild(tr1);
+                            }
+
+                        }
+                        else if (array_list_dirs[i][1].length >0 && array_list_dirs[i][2].length == 0) {  //说明这里是一个包含子目录的数组
+                            for (let j = 0; j < array_list_dirs[i][1].length; j++)
+                            {
+                                var tr1 = document.createElement("tr");
+                                tr1.innerHTML = array_list_dirs[i][1][j];
+                                tr1.ondblclick = load_subdirs;//这种方法和addEventListener都可以，但是不能加()，否则只会立刻执行一次。这里不加括号，类似于函数指针
+                                //tr1.addEventListener("dblclick",load_subdirs(array_list_dirs[i][2][j]));
+                                //tr1.ondblclick = load_subdirs(array_list_dirs[i][2][j]);
+                                tr1.id = "id_"+ array_list_dirs[i][1][j];       //这个带中文的id，也是可以用来去getElementById的
+                                //tr1.addEventListener("dblclick",load_subdirs1);
+                                //tr1.ondblclick = function (){alert("dblclicked!");}//这个也是可以的
+                                element_table_tbody_1.appendChild(tr1);
+                                //var element_gotbyid= document.getElementById(tr1.id);
+                                //element_gotbyid.addEventListener("click",load_subdirs1);
+
+                            }
+                        }
+                        else if(array_list_dirs[i][1].length >0 && array_list_dirs[i][2].length > 0)                                          //如果都包含
+                            alert("当前建筑: "+ str_active_arch + " 的目录： " + str_active_dir + "既包含目录，也包含文件");
+                    }
+
+                }
+                //==================================================================================================
+                /*alert("gggghhhhjjjjj");
+                var post_data={"arch_name":str_arch}
+                $.ajax({
+                    <!--url: 'add/',-->
+                    type: "POST",
+                    data: post_data,
+                    dataType: 'json',
+                    success: function (data) {
+                        //data = JSON.parse(data);
+
+                            alert("dsadsadsada");
+                    }
+                });*/
+
+            }
+            /* ==================函数load_subdirs1是用来测试用的====================================
+            function load_subdirs1(ev)
+            {
+                //alert("dblclicked! in load_subdirs1");
+                var ev= ev?ev:event;
+                var obj=ev.srcElement?ev.srcElement:ev.target;
+                alert(obj.id);
+            }
+            */
+            //===================================装载子目录，直到是图片为止，是个递归函数============
+            function load_subdirs(ev)
+            {
+                var ev= ev?ev:event;
+                var obj=ev.srcElement?ev.srcElement:ev.target;
+                var id=obj.id;
+                str_active_dir = id.substr(3,id.length-3);
+                //alert("str_active_dir is: "+ str_active_dir);
+
+
+                //===============遍历移除所有子元素，即所有目录和文件信息===============================
+                //==============如果不移除，则所有新创建的子目录或文件element都是可以有dblclick事件响应的
+                //==============移除后，新创建的element就再不响应事件
+                var element_table_tbody_1 = document.getElementById("id-table-tbody-1");
+                var array_child_nodes1 = element_table_tbody_1.childNodes;
+                if(array_child_nodes1.length >0) {
+                    for (let i = array_child_nodes1.length - 1; i >= 0; i--)
+                        element_table_tbody_1.removeChild(array_child_nodes1[i]);//注意这里要倒序移除
+                }
+                //==========================于获取active建筑群的结构信息，存入数组array_list_dirs中=============================================
+                for (let key1 in dic_stucture){
+                    if (key1== str_active_arch){
+                       array_list_dirs = dic_stucture[key1];//所以这里用直接赋值比较好。应该是相当于指针赋值操作。
+                    }
+                }
+                //==========================根据活动目录名str_active_dir，获取其下的子目录或者文件========================
+                for (let i=0; i< array_list_dirs.length; i++)       //遍历整个建筑的目录结构信息数组，查找当前活动目录名
+                {
+                    if(array_list_dirs[i][0] == str_active_dir){    //这里array_list_dirs是一个数组（子目录名或者文件名）的数组（目录名数组，含当前目录名，其下子目录数组，文件数组）的数组（含多个目录名数组）
+                        if(array_list_dirs[i][1].length == 0 && array_list_dirs[i][2].length >0 ){       //说明这里是一个包含图片文件名的数组
+                            for (let j = 0; j < array_list_dirs[i][2].length; j++)
+                            {
+                                var tr1 = document.createElement("tr");
+                                tr1.innerHTML = array_list_dirs[i][2][j];
+                                tr1.id = "id_"+ array_list_dirs[i][2][j];
+                                tr1.ondblclick = load_img;
+                                element_table_tbody_1.appendChild(tr1);
+                            }
+
+                        }
+                        else if (array_list_dirs[i][1].length >0 && array_list_dirs[i][2].length == 0) {  //说明这里是一个包含子目录的数组
+                            for (let j = 0; j < array_list_dirs[i][1].length; j++)
+                            {
+                                var tr1 = document.createElement("tr");
+                                tr1.innerHTML = array_list_dirs[i][1][j];
+                                tr1.id = "id_"+ array_list_dirs[i][1][j];
+                                tr1.ondblclick = load_subdirs;
+                                element_table_tbody_1.appendChild(tr1);
+                            }
+                        }
+                        else if(array_list_dirs[i][1].length >0 && array_list_dirs[i][2].length > 0)                                          //如果都包含
+                            alert("当前建筑: "+ str_active_arch + " 的目录： " + str_active_dir + "既包含目录，也包含文件");
+                    }
+
+                }
+            }
+            function load_img(ev)
+            {
+                var ev= ev?ev:event;
+                var obj=ev.srcElement?ev.srcElement:ev.target;
+                var id=obj.id;
+
+                str_active_img = id.substr(3,id.length-3);
+                //alert("id length is : "+ String(id.length));
+                //str_active_img = id.substr(0,id.length);
+                alert("str_active_img is: "+ str_active_img);
+                let y = document.getElementById("column_image_show");
+                str_active_img = "头门C-A立面图.jpg";
+                //y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'img/头门1-4立面图.jpg' %}\" class=\"img-thumbnail\" />" ;
+                y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static '"+ "img/头门C-A立面图.jpg"+"' %}\" class=\"img-thumbnail\" />" ;
+                //y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'img/头门C-A立面图.jpg' %}\" class=\"img-thumbnail\" />" ;
+                //alert("img loading");
+            }
+        </script>
+        <div class="row clearfix">
+            <div class="col-md-12 column">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#">首页</a>
+                    </li>
+                    <li>
+                        <a href="#">简介</a>
+                    </li>
+                    <li class="disabled">
+                        <a href="#">信息</a>
+                    </li>
+                    <!--==================================一个下拉菜单，目前没用，暂时保留==========================================
+                    <li class="dropdown pull-right">
+                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">下拉<strong class="caret"></strong></a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="#">操作</a>
+                            </li>
+                            <li>
+                                <a href="#">设置栏目</a>
+                            </li>
+                            <li>
+                                <a href="#">更多设置</a>
+                            </li>
+                            <li class="divider">
+                            </li>
+                            <li>
+                                <a href="#">分割线</a>
+                            </li>
+                        </ul>
+                    </li>
+                    ======================================================================================    -->
+                </ul>
+            </div>
+        </div>
+        <div class="row clearfix">
+            <div class="col-md-12 column">
+                <div class="carousel slide" id="carousel-178979">
+                    <ol class="carousel-indicators">
+                        <li class="active" data-slide-to="0" data-target="#carousel-178979">
+                        </li>
+                        <li data-slide-to="1" data-target="#carousel-178979">
+                        </li>
+                        <li data-slide-to="2" data-target="#carousel-178979">
+                        </li>
+                    </ol>
+                    <div class="carousel-inner">
+                        <div class="item active">
+                            <img alt="i非遗建筑" src="{% static 'img/头门1-4立面图照片.jpg' %}" class="img-thumbnail" sizes="" />
+                            <div class="carousel-caption">
+                                <h1>
+                                    <big><big><big><i>i.</i>非遗建筑</big></big></big>
+                                </h1>
+                                <p>
+                                    岭南非遗建筑保护资料站
+                                </p>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <img alt="i非遗建筑" src="{% static 'img/头门1-4立面图.jpg' %}" class="img-thumbnail" />
+                            <div class="carousel-caption">
+                                <h1>
+                                    <big><big><big><i>i.</i>非遗建筑</big></big></big>
+                                </h1>
+                                <p>
+                                    岭南非遗建筑保护资料站
+                                </p>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <img alt="i非遗建筑" src="{% static 'img/头门C-A立面图.jpg' %}" class="img-thumbnail" />
+                            <div class="carousel-caption">
+                                <h1>
+                                    <big><big><big><i>i.</i>非遗建筑</big></big></big>
+                                </h1>
+                                <p>
+                                    岭南非遗建筑保护资料站
+                                </p>
+                            </div>
+                        </div>
+                    </div> <a class="left carousel-control" href="#carousel-178979" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a> <a class="right carousel-control" href="#carousel-178979" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
+                </div>
+            </div>
+        </div>
+        <!--===================================下面是检索区=========================================-->
+        <div class="row clearfix">
+            <div class="col-md-8 column">
+                <div class="row clearfix">
+                    <div class="col-md-3 column">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">建筑群<span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="#">操作</a>
+                                    </li>
+                                    <li class="disabled">
+                                        <a href="#">另一操作</a>
+                                    </li>
+                                    <li class="divider">
+                                    </li>
+                                    <li>
+                                        <a href="#">其它</a>
+                                    </li>
+                                </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-3 column">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">室内外<span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="#">操作</a>
+                                </li>
+                                <li class="disabled">
+                                    <a href="#">另一操作</a>
+                                </li>
+                                <li class="divider">
+                                </li>
+                                <li>
+                                    <a href="#">其它</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-3 column">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">院落<span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="#">操作</a>
+                                </li>
+                                <li class="disabled">
+                                    <a href="#">另一操作</a>
+                                </li>
+                                <li class="divider">
+                                </li>
+                                <li>
+                                    <a href="#">其它</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-3 column">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">建筑体位置<span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="#">操作</a>
+                                </li>
+                                <li class="disabled">
+                                    <a href="#">另一操作</a>
+                                </li>
+                                <li class="divider">
+                                </li>
+                                <li>
+                                    <a href="#">其它</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="row clearfix">
+                    <div class="col-md-3 column">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">内容<span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="#">操作</a>
+                                </li>
+                                <li class="disabled">
+                                    <a href="#">另一操作</a>
+                                </li>
+                                <li class="divider">
+                                </li>
+                                <li>
+                                    <a href="#">其它</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-3 column">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">非遗类型<span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="#">操作</a>
+                                </li>
+                                <li class="disabled">
+                                    <a href="#">另一操作</a>
+                                </li>
+                                <li class="divider">
+                                </li>
+                                <li>
+                                    <a href="#">其它</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-3 column">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">测绘图/照片<span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="#">操作</a>
+                                </li>
+                                <li class="disabled">
+                                    <a href="#">另一操作</a>
+                                </li>
+                                <li class="divider">
+                                </li>
+                                <li>
+                                    <a href="#">其它</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-3 column">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">测绘图纸编号<span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="#">操作</a>
+                                </li>
+                                <li class="disabled">
+                                    <a href="#">另一操作</a>
+                                </li>
+                                <li class="divider">
+                                </li>
+                                <li>
+                                    <a href="#">其它</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 column">
+                <nav class="navbar navbar-default" role="navigation">
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <form class="navbar-form navbar-left" role="search">
+                            <div class="form-group">
+                                <input type="text" class="form-control" />
+                            </div> <button type="submit" class="btn btn-default">Submit</button>
+                        </form>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <!--===================================下面是建筑群导航栏====================================================-->
+        <div class="row clearfix">
+            <div class="col-md-6 column">
+                <div class="row clearfix">
+                    <div class="col-md-2 column">
+                        <div class="tabbable" id="tabs-213291">
+                            <ul class="nav nav-tabs" id="id-navtab-1">
+                                <li class="disabled" id="id-nav-li-1"><a href="#panel_tab-100001" class="disabled "><i><small><small><font color=":#00ffff">建筑群：</font></small></small></i></a></li>
+                                <!--这里应该获取建筑群列表，并显示
+                                {% for arch_name in arch_list %}
+                                <li>
+                                    <a href="#panel-423334" data-toggle="tab" id="panel_tab-100001" onclick=" load_dirs()">{{arch_name}}</a>
+                                </li>
+                                {% endfor %}
+                                -->
+                                <!--
+                                <script>
+                                    var dic_stucture ={{ pydb_structure | safe }};
+                                    obj_structure1= new Object();
+                                    obj_structure1 = (Object)pydb_structure;
+
+                                </script>
+                                var dic_stucture ={{ pydb_structure | safe }}
+                                var int_archs_num = dic_stucture.length;
+                                -->
+                                <script type="text/javascript">
+                                    //obj_structure1 =new Object();
+                                   // obj_structure1 = (Object) dic_stucture;
+                                   // for( let i =0; i<int_archs_num; i++)
+                                    /*window.onload = function(){
+                                        x1=document.getElementById("id-navtab-1");
+                                        //for(let i=0;i<3 ;i++) {
+                                            //listItem1 = document.createElement("li");
+                                            //x.appendChild(listItem1);
+                                            //listItem1.tagName=obj_structure1[i];
+                                        x1.innerHTML = "<li id=\"id-nav-li-2\"><a href=\"#panel-423334\" data-toggle=\"tab\"> test1 </a></li>";
+                                        //}
+                                        //x2=document.getElementById("id-nav-li-2");
+                                        //x1.innerHTML = "<li><a href=\"#panel-423334\" data-toggle=\"tab\"> test2 </a></li>";
+                                    }*/
+                                    var navtab1= document.getElementById("id-navtab-1");
+                                    //navtab1.innerHTML ="<li> test2 </li>";
+                                    //navtab1.innerHTML ="<li><a href=\"#panel-423334\" data-toggle=\"tab\"> test1 </a></li> ";
+                                    for( let i=0;i<list_archs.length;i++)
+                                    {
+                                        var li1= document.createElement("li");
+
+                                        var str_li_text = list_archs[i];
+                                        //console.log("li text is: " + str(i) );
+                                        //li1.innerHTML = "<a href=\"#panel-423334\" data-toggle=\"tab\" onclick=\" load_dirs()\"> "+str_li_text +"</a>";
+                                        li1.innerHTML = "<a href=\"#panel-423334\" data-toggle=\"tab\" onclick=\" load_dirs("+ "&quot"+ str_li_text+"&quot" + ")\"> "+str_li_text +"</a>";
+                                        navtab1.appendChild(li1);
+                                    }
+
+
+
+
+
+                                </script>
+                            </ul>
+                            <!--==================这个导航内容说明部分暂时保留===================================-->
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="panel-423334">
+                                    
+                                </div>
+
+                            </div>
+                            <!--===============================================================================-->
+                        </div>
+                    </div>
+                    <div class="col-md-10 column">
+                        <ul class="breadcrumb">
+                            <li>
+                                <a href="#">Home</a>
+                            </li>
+                            <li>
+                                <a href="#">Library</a>
+                            </li>
+                            <li class="active">
+                                Data
+                            </li>
+                        </ul>
+                        <table class="table table-hover table-striped table-condensed pre-scrollable" id="id-table-1" >
+                            <thead>
+                                <tr>
+                                    <th>
+                                        编号
+                                    </th>
+                                    <th>
+                                        产品
+                                    </th>
+                                    <th>
+                                        交付时间
+                                    </th>
+                                    <th>
+                                        状态
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody  id="id-table-tbody-1">
+                            <!--
+                                <tr>
+                                    <td>
+                                        1
+                                    </td>
+                                    <td>
+                                        TB - Monthly
+                                    </td>
+                                    <td>
+                                        01/04/2012
+                                    </td>
+                                    <td>
+                                        Default
+                                    </td>
+                                </tr>
+                                <tr class="success">
+                                    <td>
+                                        1
+                                    </td>
+                                    <td>
+                                        TB - Monthly
+                                    </td>
+                                    <td>
+                                        01/04/2012
+                                    </td>
+                                    <td>
+                                        Approved
+                                    </td>
+                                </tr>
+                                <tr class="error">
+                                    <td>
+                                        2
+                                    </td>
+                                    <td>
+                                        TB - Monthly
+                                    </td>
+                                    <td>
+                                        02/04/2012
+                                    </td>
+                                    <td>
+                                        Declined
+                                    </td>
+                                </tr>
+                                <tr class="warning">
+                                    <td>
+                                        3
+                                    </td>
+                                    <td>
+                                        TB - Monthly
+                                    </td>
+                                    <td>
+                                        03/04/2012
+                                    </td>
+                                    <td>
+                                        Pending
+                                    </td>
+                                </tr>
+                                <tr class="info">
+                                    <td>
+                                        4
+                                    </td>
+                                    <td>
+                                        TB - Monthly
+                                    </td>
+                                    <td>
+                                        04/04/2012
+                                    </td>
+                                    <td>
+                                        Call in to confirm
+                                    </td>
+                                </tr> -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 column" id="column_image_show">
+                <img alt="正在加载数据库中图片......" src="{% static 'img/头门1-4立面图照片.jpg' %}" class="img-thumbnail" />
+            </div>
+        </div>
+        <div class="row clearfix">
+            <div class="col-md-4 column" >
+                <p>
+                    <em>i.非遗建筑</em> 是一个非遗建筑保护展示网站，由 <strong>广州大学建筑与城市规划学院庞玥老师</strong> 主持，用来对非遗建筑的测绘和保护成果进行展示。 <small></small> 
+                </p>
+            </div>
+            <div class="col-md-4 column">
+                <div class="alert alert-success alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4>
+                        ICP 粤
+                    </h4> <strong>i.非遗建筑</strong> 粤准字 XXXXXXXXXXXX <a href="#" class="alert-link">link</a>
+                </div>
+            </div>
+            <div class="col-md-4 column">
+                <address> <strong>i.非遗建筑保护</strong><br /> 广州大学 建筑与城市规划学院<br /> 广州市 番禺区 大学城<br /> <abbr title="Phone">P:</abbr> 13600000000</address>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

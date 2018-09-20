@@ -118,9 +118,9 @@ def db_add_main():  #the main function to add data to db
         #print("dic_walk_to_json 的内容是： ", dic_walk_to_json )
     #=================for循环结束，所有建筑群都已遍历=========================================
     #=================这里应该将dic_walk_to_json写到static静态目录里
-    with open((settings.STATICFILES_DIRS[0] + "\\dirs_files.json"), 'w') as f_dirs_files_json:
+    with open((settings.STATICFILES_DIRS[0] + "\\dirs_files.json"), 'w', encoding='utf-8') as f_dirs_files_json:#这里的中文，如果不指定，则是GBK格式
         f_dirs_files_json.truncate()                        #以w方式打开，本来就会清空文件内容。这里再清空一次
-        json.dump(dic_walk_to_json, f_dirs_files_json, ensure_ascii= False) #这里的中文是GBK格式
+        json.dump(dic_walk_to_json, f_dirs_files_json, ensure_ascii= False)
 
 
 
