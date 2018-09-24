@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 {% load staticfiles %}
+
 <meta name="viewport" content="width=device-width,
                                      initial-scale=1.0,
                                      maximum-scale=1.0,
@@ -14,10 +15,10 @@
     <script type="text/javascript" src="{% static 'bootstrap-3.3.7/js/bootstrap.min.js' %}"></script>
 </head>
 <script>
-     var dic_stucture ={{ pydb_structure | safe }};
-     //var int_archs_num =0;
+     //var dic_structure ={{ pydb_structure | safe }};//这里必须是双大括号加|safe
+     var dic_structure = {{ pydb_structure |safe }}
      var list_archs = new Array();
-     for(let key1 in dic_stucture){
+     for(let key1 in dic_structure){
         //int_archs_num ++;
         list_archs.push(key1);
      }
@@ -56,13 +57,13 @@
                 }
 
                 //===========================================下面一段用于获取active建筑群的结构信息，存入数组array_list_dirs中============================
-                console.log(dic_stucture);
-                for (let key1 in dic_stucture){
+                console.log(dic_structure);
+                for (let key1 in dic_structure){
                     if (key1== str_arch_clicked){
-                        //console.log(dic_stucture[key1]);
+                        //console.log(dic_structure[key1]);
                         //array_list_dirs.length=0;   //当前结构信息的数组，清空数组//如果array_list_dirs是指向dic_stucture的存储区，类似指针，所以会导致原始dic_stucture被清空
-                        //array_list_dirs.push(dic_stucture[key1]);//重新给结构信息数组赋值，但是dic_structure[key1]只会成为数组的第一个元素。等于多了一维
-                        array_list_dirs = dic_stucture[key1];//所以这里用直接赋值比较好。应该是相当于指针赋值操作。
+                        //array_list_dirs.push(dic_structure[key1]);//重新给结构信息数组赋值，但是dic_structure[key1]只会成为数组的第一个元素。等于多了一维
+                        array_list_dirs = dic_structure[key1];//所以这里用直接赋值比较好。应该是相当于指针赋值操作。
                     }
 
                 }
@@ -149,9 +150,9 @@
                         element_table_tbody_1.removeChild(array_child_nodes1[i]);//注意这里要倒序移除
                 }
                 //==========================于获取active建筑群的结构信息，存入数组array_list_dirs中=============================================
-                for (let key1 in dic_stucture){
+                for (let key1 in dic_structure){
                     if (key1== str_active_arch){
-                       array_list_dirs = dic_stucture[key1];//所以这里用直接赋值比较好。应该是相当于指针赋值操作。
+                       array_list_dirs = dic_structure[key1];//所以这里用直接赋值比较好。应该是相当于指针赋值操作。
                     }
                 }
                 //==========================根据活动目录名str_active_dir，获取其下的子目录或者文件========================
@@ -194,12 +195,21 @@
                 str_active_img = id.substr(3,id.length-3);
                 //alert("id length is : "+ String(id.length));
                 //str_active_img = id.substr(0,id.length);
-                alert("str_active_img is: "+ str_active_img);
+
                 let y = document.getElementById("column_image_show");
-                str_active_img = "头门C-A立面图.jpg";
+                //var str_active_img_plus = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'img/头门C-A立面图.jpg'%}\" class=\"img-thumbnail\" /> ";
+                var str_active_img_plus ="img/"+ str_active_arch +"/"+ str_active_img;
+                //var str_test1="img/头门C-A立面图.jpg";
+                //var url1= "{% static '12345' %}";
+                //url1= url1.replace('12345',str_test1);
+                //alert("img is : " + str_active_img_plus);
+
+                //y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=url1 class=\"img-thumbnail\" />" ;
+                //alert("str_active_img is: "+ str_active_img_plus);
                 //y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'img/头门1-4立面图.jpg' %}\" class=\"img-thumbnail\" />" ;
-                y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static '"+ "img/头门C-A立面图.jpg"+"' %}\" class=\"img-thumbnail\" />" ;
-                //y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'img/头门C-A立面图.jpg' %}\" class=\"img-thumbnail\" />" ;
+
+                y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'abcddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd' %}\" class=\"img-thumbnail\" />".replace('abc',str_active_img_plus) ;
+
                 //alert("img loading");
             }
         </script>
