@@ -22,9 +22,11 @@
         //int_archs_num ++;
         list_archs.push(key1);
      }
+     //这里存储当前建筑和当前目录。开始当前目录用一个字符串，现考虑用一个stack，这样可以push pop。JS中直接使用数组作为堆栈
      var str_active_arch = list_archs[0];
-     var str_active_dir = list_archs[0];
-     var array_list_dirs =new Array();
+     //var str_active_dir = list_archs[0];
+     var stack_active_dir_structure = new Array();  //目录深度的堆栈
+     var array_list_dirs =new Array();              //当前选中建筑群的所有目录结构信息，是个数组，里面是[ "dir_name",[subdirs],[files]]这样的组合结构
      var str_active_img ="";
 
 
@@ -39,11 +41,10 @@
             {
                 //xmlhttp = new XMLHttpRequest();
                 str_active_arch = str_arch_clicked ;
-                str_active_dir = str_arch_clicked ;
+
                 console.log(str_arch_clicked);
                 x = document.getElementById("panel-423334");
-                //x.innerHTML = "当前建筑群是: "+list_archs[i_arch] ;
-                x.innerHTML = "当前建筑群是: "+str_arch_clicked ;
+                x.innerHTML = "当前建筑群是: "+str_active_arch ;
                 y = document.getElementById("column_image_show");
                 y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'img/头门1-4立面图.jpg' %}\" class=\"img-thumbnail\" />" ;
 
@@ -55,11 +56,29 @@
                     for (let i = array_child_nodes.length - 1; i >= 0; i--)
                         element_table_tbody_1.removeChild(array_child_nodes[i]);//注意这里要倒序移除
                 }
+                //======================获取正确的路径深度堆栈，并显示出来=========================================
+                stack_active_dir_structure.length=0;                //这里也重置当前的目录深度堆栈
+                 //str_active_dir = str_arch_clicked ;
+                stack_active_dir_structure.push(str_arch_clicked);  //当前的目录深度堆栈，应该只有一个元素，即根目录
+                //element_dirs_depth_breadcrumb = document.getElementById("id_dirs_depth_breadcrumb");
+                var element_dirs_depth_breadcrumb = document.getElementById("id_dirs_depth_breadcrumb");
+                var array_breadcrumb_child_nodes = element_dirs_depth_breadcrumb.childNodes;
+                if(array_breadcrumb_child_nodes.length >0 )
+                {
+                    for(let j = array_breadcrumb_child_nodes.length -1; j>=0; j--)
+                        element_dirs_depth_breadcrumb.removeChild(array_breadcrumb_child_nodes[j]);//倒序移除
+                }
+                for (let i_breadcrumb =0; i_breadcrumb< stack_active_dir_structure.length; i_breadcrumb++ )
+                {
+                    var li1 = document.createElement("li");
+                    li1.innerHTML = stack_active_dir_structure[i_breadcrumb];
+                    element_dirs_depth_breadcrumb.appendChild(li1);
+                }
 
                 //===========================================下面一段用于获取active建筑群的结构信息，存入数组array_list_dirs中============================
                 console.log(dic_structure);
                 for (let key1 in dic_structure){
-                    if (key1== str_arch_clicked){
+                    if (key1== str_active_arch){
                         //console.log(dic_structure[key1]);
                         //array_list_dirs.length=0;   //当前结构信息的数组，清空数组//如果array_list_dirs是指向dic_stucture的存储区，类似指针，所以会导致原始dic_stucture被清空
                         //array_list_dirs.push(dic_structure[key1]);//重新给结构信息数组赋值，但是dic_structure[key1]只会成为数组的第一个元素。等于多了一维
@@ -68,16 +87,22 @@
 
                 }
                 console.log(array_list_dirs);
+                //==============================这里首先加上一个返回上级目录的子目录，名字“..”=============================================
+                var tr0 = document.createElement("tr");
+                tr0.innerHTML = "..返回上一级";
+                tr0.onclick = load_subdirs;
+                tr0.id ="id_"+"返回上一级";
+                element_table_tbody_1.appendChild(tr0);
                 //===============================遍历当前建筑的结构信息，找到匹配的当前活动目录str_active_dir，并显示出其内容==========================
                 for (let i=0; i< array_list_dirs.length; i++)       //这里的数据结构，见“获取某建筑的目录结构信息.png”
                 {
-                    if(array_list_dirs[i][0] == str_active_dir){    //这里array_list_dirs是一个数组（子目录名或者文件名）的数组（目录名数组，含当前目录名，其下子目录数组，文件数组）的数组（含多个目录名数组）
+                    if(array_list_dirs[i][0] == stack_active_dir_structure[stack_active_dir_structure.length-1]){    //这里array_list_dirs是一个数组（子目录名或者文件名）的数组（目录名数组，含当前目录名，其下子目录数组，文件数组）的数组（含多个目录名数组）
                         if(array_list_dirs[i][1].length == 0 && array_list_dirs[i][2].length >0 ){       //说明这里是一个包含图片文件名的数组。在点建筑群时，不可能出现
                             for (let j = 0; j < array_list_dirs[i][2].length; j++)
                             {
 
                                 var tr1 = document.createElement("tr");
-                                tr1.ondblclick = load_img;
+                                tr1.onclick = load_img;
                                 tr1.innerHTML = array_list_dirs[i][2][j];
                                 element_table_tbody_1.appendChild(tr1);
                             }
@@ -88,7 +113,7 @@
                             {
                                 var tr1 = document.createElement("tr");
                                 tr1.innerHTML = array_list_dirs[i][1][j];
-                                tr1.ondblclick = load_subdirs;//这种方法和addEventListener都可以，但是不能加()，否则只会立刻执行一次。这里不加括号，类似于函数指针
+                                tr1.onclick = load_subdirs;//这种方法和addEventListener都可以，但是不能加()，否则只会立刻执行一次。这里不加括号，类似于函数指针
                                 //tr1.addEventListener("dblclick",load_subdirs(array_list_dirs[i][2][j]));
                                 //tr1.ondblclick = load_subdirs(array_list_dirs[i][2][j]);
                                 tr1.id = "id_"+ array_list_dirs[i][1][j];       //这个带中文的id，也是可以用来去getElementById的
@@ -136,8 +161,28 @@
                 var ev= ev?ev:event;
                 var obj=ev.srcElement?ev.srcElement:ev.target;
                 var id=obj.id;
-                str_active_dir = id.substr(3,id.length-3);
-                //alert("str_active_dir is: "+ str_active_dir);
+                //str_active_dir = id.substr(3,id.length-3);
+                //==========================如果是“返回上一级”，则将目录深度堆栈 -1 ；如果不是则 +1 =====================================
+                if(id.substr(3,id.length-3) =="返回上一级")
+                {
+                    stack_active_dir_structure.pop();
+                }
+                else
+                    stack_active_dir_structure.push(id.substr(3,id.length-3));  //这里将双击的子目录名入栈，深度+1
+                //==========================将这个路径深度，显示出来=====================================================
+                var element_dirs_depth_breadcrumb = document.getElementById("id_dirs_depth_breadcrumb");
+                var array_breadcrumb_child_nodes = element_dirs_depth_breadcrumb.childNodes;
+                if(array_breadcrumb_child_nodes.length >0 )
+                {
+                    for(let j = array_breadcrumb_child_nodes.length -1; j>=0; j--)
+                        element_dirs_depth_breadcrumb.removeChild(array_breadcrumb_child_nodes[j]);//倒序移除
+                }
+                for (let i_breadcrumb =0; i_breadcrumb< stack_active_dir_structure.length; i_breadcrumb++ )
+                {
+                    var li1 = document.createElement("li");
+                    li1.innerHTML = stack_active_dir_structure[i_breadcrumb];
+                    element_dirs_depth_breadcrumb.appendChild(li1);
+                }
 
 
                 //===============遍历移除所有子元素，即所有目录和文件信息===============================
@@ -149,23 +194,30 @@
                     for (let i = array_child_nodes1.length - 1; i >= 0; i--)
                         element_table_tbody_1.removeChild(array_child_nodes1[i]);//注意这里要倒序移除
                 }
-                //==========================于获取active建筑群的结构信息，存入数组array_list_dirs中=============================================
-                for (let key1 in dic_structure){
-                    if (key1== str_active_arch){
-                       array_list_dirs = dic_structure[key1];//所以这里用直接赋值比较好。应该是相当于指针赋值操作。
-                    }
-                }
-                //==========================根据活动目录名str_active_dir，获取其下的子目录或者文件========================
+                //==========================获取active建筑群的结构信息，存入数组array_list_dirs中=============================================
+                //==========================这里应该是多余的重复操作，可以去掉=============
+                // for (let key1 in dic_structure){
+                //     if (key1== str_active_arch){
+                //        array_list_dirs = dic_structure[key1];//所以这里用直接赋值比较好。应该是相当于指针赋值操作。
+                //     }
+                // }
+                //==============================这里首先加上一个返回上级目录的子目录，名字“..”=============================================
+                var tr0 = document.createElement("tr");
+                tr0.innerHTML = "..返回上一级";
+                tr0.onclick = load_subdirs;
+                tr0.id ="id_"+"返回上一级";
+                element_table_tbody_1.appendChild(tr0);
+                //==========================根据当前的目录深度堆栈 stack_active_dir_structure，获取当前目录名，然后显示其下的子目录或者文件========================
                 for (let i=0; i< array_list_dirs.length; i++)       //遍历整个建筑的目录结构信息数组，查找当前活动目录名
                 {
-                    if(array_list_dirs[i][0] == str_active_dir){    //这里array_list_dirs是一个数组（子目录名或者文件名）的数组（目录名数组，含当前目录名，其下子目录数组，文件数组）的数组（含多个目录名数组）
+                    if(array_list_dirs[i][0] == stack_active_dir_structure[stack_active_dir_structure.length -1 ]){    //这里array_list_dirs是一个数组（子目录名或者文件名）的数组（目录名数组，含当前目录名，其下子目录数组，文件数组）的数组（含多个目录名数组）
                         if(array_list_dirs[i][1].length == 0 && array_list_dirs[i][2].length >0 ){       //说明这里是一个包含图片文件名的数组
                             for (let j = 0; j < array_list_dirs[i][2].length; j++)
                             {
                                 var tr1 = document.createElement("tr");
                                 tr1.innerHTML = array_list_dirs[i][2][j];
                                 tr1.id = "id_"+ array_list_dirs[i][2][j];
-                                tr1.ondblclick = load_img;
+                                tr1.onclick = load_img;
                                 element_table_tbody_1.appendChild(tr1);
                             }
 
@@ -176,12 +228,12 @@
                                 var tr1 = document.createElement("tr");
                                 tr1.innerHTML = array_list_dirs[i][1][j];
                                 tr1.id = "id_"+ array_list_dirs[i][1][j];
-                                tr1.ondblclick = load_subdirs;
+                                tr1.onclick = load_subdirs;
                                 element_table_tbody_1.appendChild(tr1);
                             }
                         }
                         else if(array_list_dirs[i][1].length >0 && array_list_dirs[i][2].length > 0)                                          //如果都包含
-                            alert("当前建筑: "+ str_active_arch + " 的目录： " + str_active_dir + "既包含目录，也包含文件");
+                            alert("当前建筑: "+ str_active_arch + " 的目录： " + stack_active_dir_structure[stack_active_dir_structure.length -1] + "既包含目录，也包含文件");
                     }
 
                 }
@@ -207,10 +259,10 @@
                 //y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=url1 class=\"img-thumbnail\" />" ;
                 //alert("str_active_img is: "+ str_active_img_plus);
                 //y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'img/头门1-4立面图.jpg' %}\" class=\"img-thumbnail\" />" ;
+                //=====================================^^__^^========================================================================
+                y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'abcdefg' %}\" class=\"img-thumbnail\" />".replace('abcdefg',str_active_img_plus) ;
 
-                y.innerHTML = "<img alt=\"正在加载数据库中图片......\" src=\"{% static 'abcddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd' %}\" class=\"img-thumbnail\" />".replace('abc',str_active_img_plus) ;
-
-                //alert("img loading");
+                //===================================================================================================================
             }
         </script>
         <div class="row clearfix">
@@ -532,33 +584,35 @@
                             <!--===============================================================================-->
                         </div>
                     </div>
+
                     <div class="col-md-10 column">
-                        <ul class="breadcrumb">
-                            <li>
-                                <a href="#">Home</a>
-                            </li>
-                            <li>
-                                <a href="#">Library</a>
-                            </li>
-                            <li class="active">
-                                Data
-                            </li>
+                        <!--这里是显示目录深度结构的地方-->
+                        <ul class="breadcrumb" id="id_dirs_depth_breadcrumb">
+                            <!--<li>-->
+                                <!--<a href="#">Home</a>-->
+                            <!--</li>-->
+                            <!--<li>-->
+                                <!--<a href="#">Library</a>-->
+                            <!--</li>-->
+                            <!--<li class="active">-->
+                                <!--Data-->
+                            <!--</li>-->
                         </ul>
                         <table class="table table-hover table-striped table-condensed pre-scrollable" id="id-table-1" >
                             <thead>
                                 <tr>
-                                    <th>
-                                        编号
-                                    </th>
-                                    <th>
-                                        产品
-                                    </th>
-                                    <th>
-                                        交付时间
-                                    </th>
-                                    <th>
-                                        状态
-                                    </th>
+                                    <!--<th>-->
+                                        <!--编号-->
+                                    <!--</th>-->
+                                    <!--<th>-->
+                                        <!--产品-->
+                                    <!--</th>-->
+                                    <!--<th>-->
+                                        <!--交付时间-->
+                                    <!--</th>-->
+                                    <!--<th>-->
+                                        <!--状态-->
+                                    <!--</th>-->
                                 </tr>
                             </thead>
                             <tbody  id="id-table-tbody-1">
