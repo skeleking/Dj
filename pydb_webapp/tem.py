@@ -10,7 +10,16 @@ from Dj1 import settings
 # coding: utf-8
 
 #========================================以下为数据库操作部分==================================================
-
+#========================= 用来保存图片的各属性分类，进行数据的完整性测试=====
+dic_property_types = {"arch": [],
+                     "outer": [],
+                     "site": [],
+                     "location": [],
+                     "content": [],
+                     "nmch_type": [],
+                     "p_or_d": [],
+                     }
+#===========================================================================
 #==========================================================================================
 def db_add_main():  #the main function to add data to db
     print("add data to db")
@@ -117,15 +126,23 @@ def db_add_main():  #the main function to add data to db
         list_list_dirs_files=[]
         #print("dic_walk_to_json 的内容是： ", dic_walk_to_json )
     #=================for循环结束，所有建筑群都已遍历=========================================
-    #=================这里应该将dic_walk_to_json写到static静态目录里
+    #=================这里应该将dic_walk_to_json写到static静态目录里，这个是后台要传递给前端的数据内容=====================
     with open((settings.STATICFILES_DIRS[0] + "\\dirs_files.json"), 'w', encoding='utf-8') as f_dirs_files_json:#这里的中文，如果不指定，则是GBK格式
         f_dirs_files_json.truncate()                        #以w方式打开，本来就会清空文件内容。这里再清空一次
         json.dump(dic_walk_to_json, f_dirs_files_json, ensure_ascii= False)
+
+    #=================增加数据库完整性写文件=================================================
+    with open((settings.STATICFILES_DIRS[0] +"\\image_property_types.json"),'w',encoding= 'utf-8') as f_types_json_obj:
+        f_types_json_obj.truncate()
+        json.dump(dic_property_types,f_types_json_obj, ensure_ascii= False)
+
 
 
 
 
 #==========================================================================================
+
+
 def create_archs():
     """由第一级目录生成建筑列表。此目录下不应该有别的文件，忽略其他文件。"""
 
@@ -146,6 +163,8 @@ def create_archs():
 
     return list_dirs
 #=========================================================================================
+
+
 def create_directories(str_arch,list_walk_item): #list_walk_record['path',[subdirs],[files]]
     #eg: ('d:\\myWork\\DataSource\\崔氏宗祠', ['中厅', '后座', '头门', '平立剖'], ['崔氏宗祠.json'])
     print("create_directories")
@@ -163,8 +182,11 @@ def create_directories(str_arch,list_walk_item): #list_walk_record['path',[subdi
 
 
 #=========================================================================================
+
+
 def create_imgfiles(str_arch, root_dir1, filename, dic_of_jpg):
     """根据属于建筑arch的名为filename的这个JPG文件的json文件信息，来进行此文件的入库。"""
+    img_property_integrity(dic_property_types= dic_property_types, dic_of_img= dic_of_jpg)
     try:
         if myModels.Imgfiles.objects.get_or_create(file_name= filename,arch= str_arch, root_dir=root_dir1,
                                                    defaults={'outer':dic_of_jpg['outer'],'site':dic_of_jpg['site'],
@@ -177,6 +199,27 @@ def create_imgfiles(str_arch, root_dir1, filename, dic_of_jpg):
             print(filename + "      exists in table pydb_webapp_imgfiles")
     except:
         print("myModels.Imgfiles.objects.get_or_create() error :"+ filename)
+#==========================================================================================
+
+
+def img_property_integrity(dic_property_types, dic_of_img):
+
+    if dic_of_img['arch'] not in dic_property_types['arch']:
+        dic_property_types['arch'].append(dic_of_img['arch'])
+    if dic_of_img['outer'] not in dic_property_types['outer']:
+        dic_property_types['outer'].append(dic_of_img['outer'])
+    if dic_of_img['site'] not in dic_property_types['site']:
+        dic_property_types['site'].append(dic_of_img['site'])
+    if dic_of_img['location'] not in dic_property_types['location']:
+        dic_property_types['location'].append(dic_of_img['location'])
+    if dic_of_img['content'] not in dic_property_types['content']:
+        dic_property_types['content'].append(dic_of_img['content'])
+    if dic_of_img['nmch_type'] not in dic_property_types['nmch_type']:
+        dic_property_types['nmch_type'].append(dic_of_img['nmch_type'])
+    if dic_of_img['p_or_d'] not in dic_property_types['p_or_d']:
+        dic_property_types['p_or_d'].append(dic_of_img['p_or_d'])
+
+
 
 #==========================================================================================
 # def create_directories(arch): #此处约等于重现了一次os.walk
